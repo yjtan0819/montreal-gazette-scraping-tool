@@ -6,21 +6,25 @@ from pathlib import Path
 
 BASE_URL = "https://montrealgazette.com"
 
+# Get the HTML content of a page
 def get_page(url):
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36'}
     response = requests.get(url, headers=headers)
     response.raise_for_status()
     return response.text
 
+# Save the HTML content of a page to a file for caching
 def save_html_to_file(url, file_path):
     html_content = get_page(url)
     with open(file_path, 'w') as file:
         file.write(html_content)
 
+# Load the HTML content of a page from a file
 def load_html_from_file(file_path):
     with open(file_path, 'r') as file:
         return file.read()
 
+# Extract the links of the trending stories
 def extract_trending_links():
     homepage_content = load_html_from_file("homepage.html")
     soup = BeautifulSoup(homepage_content, 'html.parser')
@@ -35,6 +39,8 @@ def extract_trending_links():
         links.append(link)
     return links
 
+# Extract the article information from the article page
+# such as title, publication date, author, and blurb (summary)
 def extract_article_info(article_url):
     article_content = load_html_from_file(article_url)
     soup = BeautifulSoup(article_content, 'html.parser')
@@ -62,7 +68,7 @@ def extract_article_info(article_url):
     return article_info
 
 def main(output_file):
-
+    # Save the homepage HTML to a file for caching
     save_html_to_file("https://montrealgazette.com/category/news/", "homepage.html")
     
     trending_links = extract_trending_links()
@@ -74,6 +80,7 @@ def main(output_file):
         article_info = extract_article_info(link.split('/')[-1]+".html")
         trending_articles.append(article_info)
 
+    # Save the trending articles to a JSON file
     with open(output_file, 'w') as json_file:
         json.dump(trending_articles, json_file, indent=4)
 
