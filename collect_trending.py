@@ -62,7 +62,7 @@ def extract_article_info(article_url):
     return article_info
 
 def main(output_file):
-    # Stores file for caching
+
     save_html_to_file("https://montrealgazette.com/category/news/", "homepage.html")
     
     trending_links = extract_trending_links()
